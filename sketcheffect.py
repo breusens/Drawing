@@ -10,7 +10,7 @@ N=0
 scale_percent = 5
 # exp(x)/(1+exp(x))  =z
 # x=log(z/(1-z))
-
+lf=35
 for folder in my_list:
     print(folder)
     fdir='../ffhq-dataset/images1024x1024/'+folder
@@ -35,7 +35,7 @@ for folder in my_list:
             fshift = np.fft.fftshift(f)
             rows, cols = b1.shape
             crow,ccol = rows//2 , cols//2
-            fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
+            fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
             #fshift[:crow-35,:] = 0
             #fshift[crow+35:,:] = 0
             #fshift[:,ccol+35:] = 0
@@ -48,7 +48,7 @@ for folder in my_list:
             fshift = np.fft.fftshift(f)
             rows, cols = b1.shape
             crow,ccol = rows//2 , cols//2
-            fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
+            fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
             f_ishift = np.fft.ifftshift(fshift)
             img_back = np.fft.ifft2(f_ishift)
             img_back2 = np.real(img_back)
@@ -57,7 +57,7 @@ for folder in my_list:
             fshift = np.fft.fftshift(f)
             rows, cols = b1.shape
             crow,ccol = rows//2 , cols//2
-            fshift[crow-30:crow+31, ccol-30:ccol+31] = 0
+            fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
             f_ishift = np.fft.ifftshift(fshift)
             img_back = np.fft.ifft2(f_ishift)
             img_back3 = np.real(img_back)
