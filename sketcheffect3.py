@@ -2,6 +2,9 @@ import os
 import numpy as np 
 import matplotlib.pyplot as plt
 import cv2
+from sklearn.decomposition import FastICA, PCA
+import skimage.segmentation as seg
+import skimage.color as color
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -21,17 +24,31 @@ for folder in my_list:
         imf=fdir+'/'+imagefile
         beeld = cv2.imread(imf, cv2.IMREAD_UNCHANGED)
         if not beeld is None:
-            b1=beeld[:,:,0]
-            b2=beeld[:,:,1]
-            b3=beeld[:,:,2]
-            test=beeld.copy()
-            test=np.maximum((test+1)/258,1/258)
+
+            image_slic = seg.slic(beeld,n_segments=5)
+            image_slic=color.label2rgb(image_slic, beeld, kind='avg')
+            test=np.maximum((beeld+1)/258,1/258)
             test=np.log(test/(1-test))
+
+        
             b1=test[:,:,0]
             b2=test[:,:,1]
             b3=test[:,:,2]
 
             rows, cols = b1.shape
+
+            X=np.reshape(test,(rows*cols,3))
+            ica = FastICA()
+            S_ = ica.fit_transform(X)  # Reconstruct signals
+            A_ = ica.mixing_ 
+
+            test=np.reshape(S_,(rows,cols,3))
+            image_slic=color.label2rgb(image_slic, test, kind='avg')
+            test=test-image_slic
+
+            b1=test[:,:,0]
+            b2=test[:,:,1]
+            b3=test[:,:,2]
 
             finalimage=np.zeros((rows,cols,3))
             Weight=np.array((0.5+np.arange(NBlock))/NBlock)
@@ -126,7 +143,9 @@ for folder in my_list:
                     finalimage[thissl1,thissl2,1]= img_back2
                     finalimage[thissl1,thissl2,2]= img_back3
                    
-
+            finalimage=np.dot(np.reshape(finalimage,(rows*cols,3)),A_.T)
+            finalimage=np.reshape(finalimage,(rows,cols,3))
+            finalimage=finalimage+image_slic
             finalimage=np.exp(finalimage)/(1+np.exp(finalimage))*255
             finalimage=finalimage.astype('uint8')
             cv2.imshow("Input Image",beeld)
