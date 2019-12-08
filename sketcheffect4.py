@@ -5,7 +5,6 @@ import cv2
 from sklearn.decomposition import FastICA, PCA
 import skimage.segmentation as seg
 import skimage.color as color
-from scipy import optimize
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -15,7 +14,7 @@ scale_percent = 5
 # exp(x)/(1+exp(x))  =z
 # x=log(z/(1-z))
 NBlock=32
-lf=5
+lf=4
 
 for folder in my_list:
     print(folder)
@@ -98,8 +97,17 @@ for folder in my_list:
 
                     f = np.fft.fft2(Intermediate1)
                     fshift = np.fft.fftshift(f)
+                   
                     rowsI, colsI = Intermediate1.shape
                     crow,ccol = rowsI//2 , colsI//2
+                    signmaskx=0*fshift[1,:]
+                    signmasky=0*fshift[:,1]
+                    signmaskx[:ccol]=-1
+                    signmaskx[ccol+1:]=1
+                    signmasky[:crow]=-1
+                    signmasky[crow+1:]=1
+                    signmask=np.outer(signmasky,signmaskx)
+                    fshift=(1-(1j)*signmask)
                     fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
                     #fshift[:crow-35,:] = 0
                     #fshift[crow+35:,:] = 0
@@ -107,12 +115,20 @@ for folder in my_list:
                     #fshift[:,:ccol-35] = 0
                     f_ishift = np.fft.ifftshift(fshift)
                     img_back = np.fft.ifft2(f_ishift)
-                    img_back1 = np.real(img_back)
+                    img_back1 = (np.real(img_back))*(np.real(img_back))+(np.imag(img_back))*(np.imag(img_back))
 
                     f = np.fft.fft2(Intermediate2)
                     fshift = np.fft.fftshift(f)
                     rowsI, colsI = Intermediate1.shape
                     crow,ccol = rowsI//2 , colsI//2
+                    signmaskx=0*fshift[1,:]
+                    signmasky=0*fshift[:,1]
+                    signmaskx[:ccol]=-1
+                    signmaskx[ccol+1:]=1
+                    signmasky[:crow]=-1
+                    signmasky[crow+1:]=1
+                    signmask=np.outer(signmasky,signmaskx)
+                    fshift=(1-(1j)*signmask)
                     fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
                     #fshift[:crow-35,:] = 0
                     #fshift[crow+35:,:] = 0
@@ -120,12 +136,20 @@ for folder in my_list:
                     #fshift[:,:ccol-35] = 0
                     f_ishift = np.fft.ifftshift(fshift)
                     img_back = np.fft.ifft2(f_ishift)
-                    img_back2 = np.real(img_back)
+                    img_back2 = (np.real(img_back))*(np.real(img_back))+(np.imag(img_back))*(np.imag(img_back))
 
                     f = np.fft.fft2(Intermediate3)
                     fshift = np.fft.fftshift(f)
                     rowsI, colsI = Intermediate1.shape
                     crow,ccol = rowsI//2 , colsI//2
+                    signmaskx=0*fshift[1,:]
+                    signmasky=0*fshift[:,1]
+                    signmaskx[:ccol]=-1
+                    signmaskx[ccol+1:]=1
+                    signmasky[:crow]=-1
+                    signmasky[crow+1:]=1
+                    signmask=np.outer(signmasky,signmaskx)
+                    fshift=(1-(1j)*signmask)
                     fshift[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
                     #fshift[:crow-35,:] = 0
                     #fshift[crow+35:,:] = 0
@@ -133,7 +157,7 @@ for folder in my_list:
                     #fshift[:,:ccol-35] = 0
                     f_ishift = np.fft.ifftshift(fshift)
                     img_back = np.fft.ifft2(f_ishift)
-                    img_back3 = np.real(img_back)
+                    img_back3 = (np.real(img_back))*(np.real(img_back))+(np.imag(img_back))*(np.imag(img_back))
 
                     img_back1=img_back1[rsl1,rsl2]
                     img_back2=img_back2[rsl1,rsl2]
@@ -143,16 +167,7 @@ for folder in my_list:
                     finalimage[thissl1,thissl2,0]= img_back1
                     finalimage[thissl1,thissl2,1]= img_back2
                     finalimage[thissl1,thissl2,2]= img_back3
-
-
                    
-
-
-
-
-            
-            fi=finalimage[500,:,0]
-
             finalimage=np.dot(np.reshape(finalimage,(rows*cols,3)),A_.T)
             finalimage=np.reshape(finalimage,(rows,cols,3))
             finalimage=finalimage+image_slic
@@ -161,9 +176,6 @@ for folder in my_list:
             cv2.imshow("Input Image",beeld)
             cv2.imshow("spectrum magnitude",finalimage)
             cv2.waitKey()
-           
-
-
 
 
 sd=x/N-np.outer(y/N,y/N)
