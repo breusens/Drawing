@@ -109,11 +109,11 @@ for folder in my_list:
             changeO3=np.diff(b3,axis=0)[:,:-1]*np.sin(Y)+np.diff(b3,axis=1)[:-1,:]*np.cos(Y)
             changeN3=np.diff(img_back3,axis=0)[:,:-1]*np.sin(Y)+np.diff(img_back3,axis=1)[:-1,:]*np.cos(Y)
 
-            X1=np.sqrt((changeO1-changeN1)*(changeO1-changeN1))  
+            X1=np.abs((changeO1-changeN1))
             Y1=-X1
-            X2=np.sqrt((changeO2-changeN2)*(changeO2-changeN2))  
+            X2=np.abs((changeO2-changeN2))
             Y2=-X2 
-            X3=np.sqrt((changeO3-changeN3)*(changeO3-changeN3))  
+            X3=np.abs((changeO3-changeN3))  
             Y3=-X3
 
             X=np.zeros((1023,1023,3))
@@ -127,13 +127,9 @@ for folder in my_list:
             Y[:,:,1]=Y2
             Y[:,:,2]=Y3
 
-
-            scale1=np.min(X)
-            scale2=np.max(X)
-            X=255*(X-scale1)/(scale2-scale1)
-            scale1=np.min(Y)
-            scale2=np.max(Y)
-            Y=255*(Y-scale1)/(scale2-scale1)
+            X=np.exp(X)/(1+np.exp(X))*255
+            X=np.exp(Y)/(1+np.exp(Y))*255
+            
             cv2.imshow("bad pointsW",X.astype('uint8'))
             cv2.imshow("bad pointsB",Y.astype('uint8'))
             cv2.waitKey()
