@@ -2,7 +2,9 @@ import os
 import numpy as np 
 import matplotlib.pyplot as plt
 import cv2
-from quaternioDFT import filters
+from quaternioDFT import QFT
+from quaternioDFT import iQFT
+
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
 y=0
@@ -11,7 +13,7 @@ scale_percent = 5
 # exp(x)/(1+exp(x))  =z
 # x=log(z/(1-z))
 NBlock=32
-lf=50
+lf=0
 
 for folder in my_list:
     print(folder)
@@ -21,17 +23,54 @@ for folder in my_list:
         imf=fdir+'/'+imagefile
         beeld = cv2.imread(imf, cv2.IMREAD_UNCHANGED)
         if not beeld is None:
+            beeldx=np.zeros((1024,1024,3))
             b1=beeld[:,:,0]
             b2=beeld[:,:,1]
             b3=beeld[:,:,2]
             test=beeld.copy()
-            test=np.maximum((test+1)/258,1/258)
+            test=np.maximum((test.astype('float64')+1)/258,1/258)
             test=np.log(test/(1-test))
             b1=test[:,:,0]
             b2=test[:,:,1]
             b3=test[:,:,2]
 
-            
+            T0,Ti,Tj,Tk=QFT(0*b1,b1,b2,b3)
+            fshift0 = T0
+            fshifti = Ti
+            fshiftj = Tj
+            fshiftk = Tk
+
+            rows, cols = b1.shape
+            crow,ccol = rows//2 , cols//2
+        
+            fshift0[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
+            fshifti[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
+            fshiftj[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
+            fshiftk[crow-lf:crow+lf, ccol-lf:ccol+lf] = 0
+
+
+
+            X0 = fshift0.T
+            Xi = fshifti.T
+            Xj = fshiftj.T
+            Xk = fshiftk.T
+
+            A0,Ai,Aj,Ak=QFT(X0,Xi,Xj,Xk)
+
+            A0=np.fft.fftshift(A0)
+            Ai=np.fft.fftshift(Ai)
+            Aj=np.fft.fftshift(Aj)
+            Ak=np.fft.fftshift(Ak)
+
+            beeldx[:,:,0]=Ai.T/(1024*1024)
+            beeldx[:,:,1]=Aj.T/(1024*1024)
+            beeldx[:,:,2]=Ak.T/(1024*1024)
+
+        
+            beeldx=np.exp(beeldx)/(1+np.exp(beeldx))*255
+            cv2.imshow("original",beeld.astype('uint8'))
+            cv2.imshow("QFT",beeldx.astype('uint8'))
+            cv2.waitKey()
 
             rows, cols = b1.shape
 
@@ -118,7 +157,6 @@ for folder in my_list:
 
             X=np.zeros((1023,1023,3))
             Y=np.zeros((1023,1023,3))
-            Z=np.zeros((1024,1024,3))
 
             X[:,:,0]=X1
             X[:,:,1]=X2
@@ -128,19 +166,11 @@ for folder in my_list:
             Y[:,:,1]=Y2
             Y[:,:,2]=Y3
 
-            Z[:,:,0]=enveloppe1
-            Z[:,:,1]=enveloppe2
-            Z[:,:,2]=enveloppe3
-
             X=X/(1+X)*255
-            Z=Z/(1+Z)*255
             Y=255-X
-            Z=255-Z
             
             cv2.imshow("bad pointsW",X.astype('uint8'))
             cv2.imshow("bad pointsB",Y.astype('uint8'))
-            cv2.imshow("bad pointsE",Z.astype('uint8'))
-            
             cv2.waitKey()
 
             enveloppe1=enveloppe1

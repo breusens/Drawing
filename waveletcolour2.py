@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from quaternioDFT import filters
+import pywt
+import pywt.data
+
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
 y=0
@@ -12,6 +15,7 @@ scale_percent = 5
 # x=log(z/(1-z))
 NBlock=32
 lf=50
+# F(x,y)*G(x,y)=A(w,v)exp(iwx)exp(iyv)*G(x,y)
 
 for folder in my_list:
     print(folder)
@@ -30,9 +34,14 @@ for folder in my_list:
             b1=test[:,:,0]
             b2=test[:,:,1]
             b3=test[:,:,2]
-
             
 
+
+# Load image
+
+
+# Wavelet transform of image, and plot approximation and details
+            
             rows, cols = b1.shape
 
             finalimage=np.zeros((rows,cols,3))

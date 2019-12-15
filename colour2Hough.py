@@ -116,9 +116,31 @@ for folder in my_list:
             X3=np.abs((changeO3-changeN3))  
             Y3=-X3
 
+            dx=np.diff(Y1,axis=1)[:-1,:]
+            I=dx==0
+            UZ1= np.arctan(np.diff(Y1,axis=0)[:,:-1]/np.diff(Y1,axis=1)[:-1,:])
+            UZ1[I]=np.pi/2
+
+            dx=np.diff(Y2,axis=1)[:-1,:]
+            I=dx==0
+            UZ2= np.arctan(np.diff(Y2,axis=0)[:,:-1]/np.diff(Y2,axis=1)[:-1,:])
+            UZ2[I]=np.pi/2
+
+            dx=np.diff(Y3,axis=1)[:-1,:]
+            I=dx==0
+            UZ3= np.arctan(np.diff(Y3,axis=0)[:,:-1]/np.diff(Y3,axis=1)[:-1,:])
+            UZ3[I]=np.pi/2
+
             X=np.zeros((1023,1023,3))
             Y=np.zeros((1023,1023,3))
             Z=np.zeros((1024,1024,3))
+            UZ=np.zeros((1022,1022,3))
+
+            UZ[:,:,0]=UZ1
+            UZ[:,:,1]=UZ2
+            UZ[:,:,2]=UZ3
+
+
 
             X[:,:,0]=X1
             X[:,:,1]=X2
@@ -136,12 +158,50 @@ for folder in my_list:
             Z=Z/(1+Z)*255
             Y=255-X
             Z=255-Z
+
+            XH=np.zeros((1000,1023//32))
+            image=Y.astype('uint8')
+
+            blk=64
+
+            for sc in range(1023//blk):
+                for sr in range(1023//blk):
+                    si=X1[sr*blk:(sr+1)*blk,sc*blk:(sc+1)*blk]
+                    sicomp=b1[sr*blk:(sr+1)*blk,sc*blk:(sc+1)*blk]
+                    mean=np.average(si)
+                    meanc=np.average(sicomp)
+                    stdev=np.std(si)
+                    stdevc=np.std(sicomp)
+                    restdev=stdev/np.sqrt(blk)
+                    restdevc=stdevc/np.sqrt(blk)
+                    csum=np.sum(si,0)/blk
+                    rsum=np.sum(si,1)/blk
+                    csumc=np.sum(sicomp,0)/blk
+                    rsumc=np.sum(sicomp,1)/blk
+                    I1=np.abs(csum-mean)>(2*restdev)
+                    I2=np.abs(rsum-mean)>(2*restdev)
+                    I1c=np.abs(csumc-meanc)>(2*restdevc)
+                    I2c=np.abs(rsumc-meanc)>(2*restdevc)
+                    if (any(I1) and not(any(I1c))):
+                        i1=np.nonzero(I1)
+                        for ln in np.argwhere(I1):
+                            cv2.line(image, (sc*blk+ln,sr*blk), (sc*blk+ln,(sr+1)*blk-1), (0,255,0), 1)
+                    if (any(I2) and not(any(I2c))):
+                        i1=np.nonzero(I2)
+                        for ln in np.argwhere(I2):
+                            cv2.line(image, (sc*blk,sr*blk+ln), ((sc+1)*blk-1,sr*blk+ln), (0,255,0), 1)
+
             
-            cv2.imshow("bad pointsW",X.astype('uint8'))
-            cv2.imshow("bad pointsB",Y.astype('uint8'))
+            XP=np.abs(np.prod(XH,1))
+            ai=np.flip(np.argsort(XP))
+              
+
+            cv2.imshow("bad pointsW",image)
             cv2.imshow("bad pointsE",Z.astype('uint8'))
+            cv2.imshow("bad pointsUZ",UZ.astype('uint8'))
             
             cv2.waitKey()
+
 
             enveloppe1=enveloppe1
 
