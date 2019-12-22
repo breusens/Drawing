@@ -9,7 +9,7 @@ from fftwostripe import fftwostripe
 from AC import AC
 from neighbourAverage import neighbourAverage
 from CartToPolar import CartToPolar
-from GravitationalFilter import GravitationalFilter
+from GravitationalFilterMistake import GravitationalFilter
 from NHFilter import NHFilter
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
@@ -120,6 +120,7 @@ for folder in my_list:
                 NHF=NHFilter()
             
                 for repeats in range(100):
+                    
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -129,20 +130,21 @@ for folder in my_list:
                 dst = cv2.filter2D(ld2,-1,filt)
                 maxi=np.argmax(dst)
                 ld2 = 255-(ld2+1)*255
-                dst3 = (dst+1)/2
+                dst3 = 25*dst
 
                 
                 
                 ld[:,:,0]=ld[:,:,0]+25*dst1
                 ld[:,:,1]=ld[:,:,0]+25*dst2
                 ld[:,:,2]=ld[:,:,0]+25*dst3
+                dst3=250*dst3
                 ld1=255*X-ld
 
             ld=255-ld
             cv2.imshow("Input Image",beeld)
             cv2.imshow("white",lw.astype('uint8'))
             cv2.imshow("black",lb.astype('uint8'))
-            cv2.imshow("filter",dst.astype('uint8'))
+            cv2.imshow("filter",dst3.astype('uint8'))
             cv2.imshow("prefilter",ld.astype('uint8'))
            
 
