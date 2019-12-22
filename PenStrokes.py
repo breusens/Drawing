@@ -11,6 +11,7 @@ from neighbourAverage import neighbourAverage
 from CartToPolar import CartToPolar
 from GravitationalFilter import GravitationalFilter
 from NHFilter import NHFilter
+from StrokeApproximation import StrokeApproximation
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -77,72 +78,35 @@ for folder in my_list:
             #-R+R=0
             #-R+4*R^2/2*R=-R+2*R=+R
 
-            filt=GravitationalFilter(1,1,20)
+            filt=GravitationalFilter(1,3,20)
             ld1=255*X
             ld=np.zeros((cols,rows,3))
 
-            for level in range(10):
+            for level in range(25):
 
                 ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,0]<25)]=-1
-                NHF=NHFilter()
-            
-                for repeats in range(100):
-                    avdst=cv2.filter2D(ld2,-1,NHF)
-                    I=np.logical_and(ld2==1,avdst<-5/8)
-                    J=np.logical_and(ld2==-1,avdst>5/8)
-                    ld2[I]=-1
-                    ld2[J]=1
-
-                dst = cv2.filter2D(ld2,-1,filt)
-                maxi=np.argmax(dst)
-                ld2 = 255-(ld2+1)*255
-                dst1 = (dst+1)/2
+                ld2[np.where(ld1[:,:,0]<10)]=-1
+                dst1=StrokeApproximation(ld2)
 
                 ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,1]<25)]=-1
-                NHF=NHFilter()
-            
-                for repeats in range(100):
-                    avdst=cv2.filter2D(ld2,-1,NHF)
-                    I=np.logical_and(ld2==1,avdst<-5/8)
-                    J=np.logical_and(ld2==-1,avdst>5/8)
-                    ld2[I]=-1
-                    ld2[J]=1
-
-                dst = cv2.filter2D(ld2,-1,filt)
-                maxi=np.argmax(dst)
-                ld2 = 255-(ld2+1)*255
-                dst2 = (dst+1)/2
+                ld2[np.where(ld1[:,:,1]<10)]=-1
+                dst2=StrokeApproximation(ld2)
 
                 ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,2]<25)]=-1
-                NHF=NHFilter()
-            
-                for repeats in range(100):
-                    avdst=cv2.filter2D(ld2,-1,NHF)
-                    I=np.logical_and(ld2==1,avdst<-5/8)
-                    J=np.logical_and(ld2==-1,avdst>5/8)
-                    ld2[I]=-1
-                    ld2[J]=1
+                ld2[np.where(ld1[:,:,2]<10)]=-1
+                dst3=StrokeApproximation(ld2)
 
-                dst = cv2.filter2D(ld2,-1,filt)
-                maxi=np.argmax(dst)
-                ld2 = 255-(ld2+1)*255
-                dst3 = (dst+1)/2
-
-                
-                
                 ld[:,:,0]=ld[:,:,0]+25*dst1
-                ld[:,:,1]=ld[:,:,0]+25*dst2
-                ld[:,:,2]=ld[:,:,0]+25*dst3
-                ld1=255*X-ld
+                ld[:,:,1]=ld[:,:,1]+25*dst2
+                ld[:,:,2]=ld[:,:,2]+25*dst3
+                dst3=(1+dst3)/2
+                ld1=255*X-ld   
 
             ld=255-ld
             cv2.imshow("Input Image",beeld)
             cv2.imshow("white",lw.astype('uint8'))
             cv2.imshow("black",lb.astype('uint8'))
-            cv2.imshow("filter",dst.astype('uint8'))
+            cv2.imshow("filter",dst3.astype('uint8'))
             cv2.imshow("prefilter",ld.astype('uint8'))
            
 
