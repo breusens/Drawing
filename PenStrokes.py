@@ -11,7 +11,7 @@ from neighbourAverage import neighbourAverage
 from CartToPolar import CartToPolar
 from GravitationalFilter import GravitationalFilter
 from NHFilter import NHFilter
-from StrokeApproximation import StrokeApproximation
+from BrushApproximation import BrushApproximation
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -86,19 +86,19 @@ for folder in my_list:
 
                 ld2=np.ones((cols,rows))
                 ld2[np.where(ld1[:,:,0]<10)]=-1
-                dst1=StrokeApproximation(ld2)
+                dst1=BrushApproximation(ld2,[1,5])
 
                 ld2=np.ones((cols,rows))
                 ld2[np.where(ld1[:,:,1]<10)]=-1
-                dst2=StrokeApproximation(ld2)
+                dst2=BrushApproximation(ld2,[1,5])
 
                 ld2=np.ones((cols,rows))
                 ld2[np.where(ld1[:,:,2]<10)]=-1
-                dst3=StrokeApproximation(ld2)
+                dst3=BrushApproximation(ld2,[1,5])
 
-                ld[:,:,0]=ld[:,:,0]+25*dst1
-                ld[:,:,1]=ld[:,:,1]+25*dst2
-                ld[:,:,2]=ld[:,:,2]+25*dst3
+                ld[:,:,0]=ld[:,:,0]+10*dst1
+                ld[:,:,1]=ld[:,:,1]+10*dst2
+                ld[:,:,2]=ld[:,:,2]+10*dst3
                 dst3=(1+dst3)/2
                 ld1=255*X-ld   
 
