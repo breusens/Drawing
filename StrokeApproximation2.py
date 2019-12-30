@@ -16,6 +16,15 @@ def OneStroke(X,dst):
         black= X[coord]<0
         line.append(coord)
         this=coord
+        xmin=max(coord[1]-21,0)
+        xmax=max(coord[1]+22,0)
+        ymin=max(coord[0]-21,0)
+        ymax=max(coord[0]+22,0)
+        xmin2=xmin-coord[1]-21
+        xmax2=41+xmax-(coord[1]+22)
+        ymin2=ymin-coord[1]-21
+        ymax2=41+ymax-(coord[1]+22)
+        dst[ymin:ymax,xmin:xmax]=dst[ymin:ymax,xmin:xmax]+2*filt[ymin2:ymax2,xmin2:xmax2]
         neighbours=get_neighbours(this, exclude_p=True, shape=(rows,cols))
         dif=np.zeros(neighbours.shape[0])
         for counter, point in enumerate(neighbours):
@@ -35,6 +44,16 @@ def OneStroke(X,dst):
         direct=direct1
         while black:
             line.append(tuple(volg))
+            coord=volg
+            xmin=max(coord[1]-21,0)
+            xmax=max(coord[1]+22,0)
+            ymin=max(coord[0]-21,0)
+            ymax=max(coord[0]+22,0)
+            xmin2=xmin-coord[1]-21
+            xmax2=41+xmax-(coord[1]+22)
+            ymin2=ymin-coord[1]-21
+            ymax2=41+ymax-(coord[1]+22)
+            dst[ymin:ymax,xmin:xmax]=dst[ymin:ymax,xmin:xmax]+2*filt[ymin2:ymax2,xmin2:xmax2]
             neighbours=get_neighbours(volg, exclude_p=True, shape=(rows,cols))
             dif=np.zeros(neighbours.shape[0])
             this=volg
@@ -52,6 +71,16 @@ def OneStroke(X,dst):
         direct=direct2
         while black:
             line.append(tuple(volg))
+            coord=volg
+            xmin=max(coord[1]-21,0)
+            xmax=max(coord[1]+22,0)
+            ymin=max(coord[0]-21,0)
+            ymax=max(coord[0]+22,0)
+            xmin2=xmin-coord[1]-21
+            xmax2=41+xmax-(coord[1]+22)
+            ymin2=ymin-coord[1]-21
+            ymax2=41+ymax-(coord[1]+22)
+            dst[ymin:ymax,xmin:xmax]=dst[ymin:ymax,xmin:xmax]+2*filt[ymin2:ymax2,xmin2:xmax2]
             neighbours=get_neighbours(volg, exclude_p=True, shape=(rows,cols))
             dif=np.zeros(neighbours.shape[0])
             this=volg
@@ -70,19 +99,19 @@ def OneStroke(X,dst):
         ymin=rows
         for point in line:
             Y[tuple(point)]=1
-            xmax=max(xmax,point[1])
-            xmin=min(xmin,point[1])
-            ymax=max(ymax,point[0])
-            ymin=min(ymin,point[0])
-        xmax=min(xmax+22,cols)
-        xmin=max(xmin-21,0)
-        ymax=min(ymax+22,rows)
-        ymin=max(ymin-21,0)
-        dst2=0*dst2
-        dst2[ymin:ymax,xmin:xmax]=2*cv2.filter2D(Y[ymin:ymax,xmin:xmax],-1,filt)
-        dst2=dst+dst2
+            #xmax=max(xmax,point[1])
+            #xmin=min(xmin,point[1])
+            #ymax=max(ymax,point[0])
+            #ymin=min(ymin,point[0])
+        #xmax=min(xmax+22,cols)
+        #xmin=max(xmin-21,0)
+        #ymax=min(ymax+22,rows)
+        #ymin=max(ymin-21,0)
+        #dst2=0*dst2
+        #dst2[ymin:ymax,xmin:xmax]=2*cv2.filter2D(Y[ymin:ymax,xmin:xmax],-1,filt)
+        #dst2=dst+dst2
         
-    return Y,dst2
+    return Y,dst
 
 def StrokeApproximation(X):
     progress=True

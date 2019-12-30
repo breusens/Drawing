@@ -87,7 +87,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,0]<10)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -103,7 +103,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,1]<10)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -119,7 +119,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,2]<10)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
@@ -137,7 +137,7 @@ for folder in my_list:
                 ld[:,:,0]=ld[:,:,0]+25*dst1
                 ld[:,:,1]=ld[:,:,1]+25*dst2
                 ld[:,:,2]=ld[:,:,2]+25*dst3
-                dst3=(1+dst3)/2
+                dst3=(1+dst3)/2 
                 ld1=255*X-ld
 
             ld=255-ld
