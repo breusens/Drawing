@@ -87,7 +87,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,0]<25)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -103,7 +103,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,1]<25)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -119,7 +119,7 @@ for folder in my_list:
                 ld2[np.where(ld1[:,:,2]<25)]=-1
                 NHF=NHFilter()
             
-                for repeats in range(100):
+                for repeats in range(1):
                     avdst=cv2.filter2D(ld2,-1,NHF)
                     I=np.logical_and(ld2==1,avdst<-5/8)
                     J=np.logical_and(ld2==-1,avdst>5/8)
@@ -142,7 +142,7 @@ for folder in my_list:
             cv2.imshow("Input Image",beeld)
             cv2.imshow("white",lw.astype('uint8'))
             cv2.imshow("black",lb.astype('uint8'))
-            cv2.imshow("filter",dst.astype('uint8'))
+            cv2.imshow("filter1",dst.astype('uint8'))
             cv2.imshow("prefilter",ld.astype('uint8'))
            
 
