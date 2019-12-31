@@ -77,8 +77,9 @@ for folder in my_list:
             #R
             #-R+R=0
             #-R+4*R^2/2*R=-R+2*R=+R
+            degree=3
 
-            filt=GravitationalFilter(1,3,20)
+            filt=GravitationalFilter(0.5,degree,20)
             ld1=255*X
             ld=np.zeros((cols,rows,3))
 
@@ -100,20 +101,22 @@ for folder in my_list:
                 ld[:,:,1]=ld[:,:,1]+20*dst2
                 ld[:,:,2]=ld[:,:,2]+20*dst3
                 dst3=(1+dst3)/2
-                ld1=255*X-ld   
+                ld1=255*X-ld 
 
-                cv2.imshow('temp',255-ld.astype('uint8'))
+                imagename=imagefile[:-4]+str(level)+'.png' 
+                ldshow=(250-ld*10/level).astype('uint8')
+                cv2.imshow(str(level),ldshow)
                 cv2.waitKey(1)
+                cv2.imwrite( imagename,ldshow)
 
-            ld=255-ld
+            ld=(255-ld).astype('uint8')
             cv2.imshow("Input Image",beeld)
             cv2.imshow("white",lw.astype('uint8'))
             cv2.imshow("black",lb.astype('uint8'))
-            cv2.imshow("filter",dst3.astype('uint8'))
-            cv2.imshow("prefilter",ld.astype('uint8'))
-           
-
-            cv2.waitKey()
+            cv2.imshow("prefilter",ld)
+            imagename=imagefile
+            cv2.imwrite( imagename,ld)
+            cv2.waitKey(1)
             #plt.show()
             
 
