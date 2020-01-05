@@ -32,7 +32,7 @@ def fftwostripe(x,lf):
     changeO1=np.diff(x,axis=0)[:,:-1]*np.sin(Y)+np.diff(x,axis=1)[:-1,:]*np.cos(Y)
     changeN1=np.diff(img_back1,axis=0)[:,:-1]*np.sin(Y)+np.diff(img_back1,axis=1)[:-1,:]*np.cos(Y)
     NM=np.abs((changeO1-changeN1))
-    NM2=(changeO1-changeN1)
+    NM2=np.sqrt(np.power(np.diff(x,axis=0)[:,:-1],2)+np.power(np.diff(x,axis=1)[:-1,:],2))
 
     #img_back1=(NM[:-1,:-1]+NM[1:,:-1]+NM[1:,1:]+NM[:-1,:1])/4
     

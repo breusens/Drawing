@@ -13,6 +13,7 @@ from GravitationalFilter import GravitationalFilter
 from NHFilter import NHFilter
 from StrokeApproximation import StrokeApproximation
 from ConstantApprox import ConstantApprox
+from sklearn.decomposition import FastICA
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -32,13 +33,17 @@ for folder in my_list:
         imf=fdir+'/'+imagefile
         beeld = cv2.imread(imf, cv2.IMREAD_UNCHANGED)
         if not beeld is None:
-            beeld = cv2.cvtColor(beeld, cv2.COLOR_BGR2HSV)
-            b1=beeld[:,:,0]
-            b2=beeld[:,:,1]
-            b3=beeld[:,:,2]
+            #beeld = cv2.cvtColor(beeld, cv2.COLOR_BGR2Lab)
+            #beeld[:,:,0]=255/179*beeld[:,:,0]
+            transformer = FastICA(n_components=3,random_state=0)
+            cols,rows,chs=beeld.shape
             test=beeld.copy()
             test=np.maximum((test+1)/258,1/258)
             test=np.log(test/(1-test))
+            test=np.reshape(test,(cols*rows,chs))
+            test = transformer.fit_transform(test)
+            test=np.reshape(test,(cols,rows,chs))
+
             b1=test[:,:,0]
             b2=test[:,:,1]
             b3=test[:,:,2]
@@ -63,8 +68,8 @@ for folder in my_list:
 
 
 
-            lw=le/(1+le)*255
-            lb= ls/(1+ls)*255
+            lw=le
+            lb= ls
             law= la/(1+la)*255
             lab=la/(1+la)*255
 
@@ -108,11 +113,19 @@ for folder in my_list:
                 #cv2.waitKey(1)
 
             ld=255-ld
-            lw = cv2.cvtColor(lw.astype('uint8'), cv2.COLOR_HSV2BGR)
-            lb = cv2.cvtColor(lb.astype('uint8'), cv2.COLOR_HSV2BGR)
+            #lw[:,:,0]=179/255*lw[:,:,0]
+            #lb[:,:,0]=179/255*lb[:,:,0]
+            #lw = cv2.cvtColor(lw.astype('uint8'), cv2.COLOR_Lab2BGR)
+            #lb = cv2.cvtColor(lb.astype('uint8'), cv2.COLOR_Lab2BGR)
+            #lw=transformer.inverse_transform(np.reshape(lw,(cols*rows,chs)))
+            #lw=np.reshape(lw,(cols,rows,chs))
+            #lb=transformer.inverse_transform(np.reshape(lb,(cols*rows,chs)))
+            #lb=np.reshape(lb,(cols,rows,chs))
+            lw=100*255*lw/np.max(lw)
+            lb=100*255*lb/np.max(lb)
             cv2.imshow("Input Image",beeld)
-            cv2.imshow("white1",lw.astype('uint8'))
-            cv2.imshow("white2",lb.astype('uint8'))
+            cv2.imshow("white1",255-lw.astype('uint8'))
+            cv2.imshow("white2",255-lb.astype('uint8'))
            
 
             cv2.waitKey()
