@@ -12,6 +12,7 @@ from CartToPolar import CartToPolar
 from GravitationalFilter import GravitationalFilter
 from NHFilter import NHFilter
 from StrokeApproximation import StrokeApproximation
+from ConstantApprox import ConstantApprox
 
 my_list = os.listdir('../ffhq-dataset/images1024x1024')
 x=0
@@ -21,7 +22,7 @@ scale_percent = 5
 # exp(x)/(1+exp(x))  =z
 # x=log(z/(1-z))
 NBlock=32
-lf=10
+lf=30
 
 for folder in my_list:
     print(folder)
@@ -61,9 +62,9 @@ for folder in my_list:
 
 
 
-            lw=255-np.exp(le)/(1+np.exp(le))*255
-            lb= 255-le/(1+le)*255
-            law= 255-la/(1+la)*255
+            lw=255-2*np.exp(le)/(1+np.exp(le))*255
+            lb= 255-2*le/(1+le)*255
+            law= le/(1+le)*255
             lab=la/(1+la)*255
 
             X=le/(1+le)
@@ -77,50 +78,40 @@ for folder in my_list:
             #R
             #-R+R=0
             #-R+4*R^2/2*R=-R+2*R=+R
-            degree=3
 
-            filt=GravitationalFilter(0.5,degree,20)
+            filt=GravitationalFilter(np.sqrt(2),3,20)
             ld1=255*X
             ld=np.zeros((cols,rows,3))
 
-            for level in range(14):
+            #for level in range(14):
 
-                ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,0]<20)]=-1
-                dst1=StrokeApproximation(ld2)
+                #ld2=np.ones((cols,rows))
+                #ld2[np.where(ld1[:,:,0]<20)]=-1
+                #dst1=ConstantApprox(ld2,filt,0.99)
 
-                ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,1]<20)]=-1
-                dst2=StrokeApproximation(ld2)
+                #ld2=np.ones((cols,rows))
+                #ld2[np.where(ld1[:,:,1]<20)]=-1
+                #dst2=ConstantApprox(ld2,filt,0.99)
 
-                ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,2]<20)]=-1
-                dst3=StrokeApproximation(ld2)
+                #ld2=np.ones((cols,rows))
+                #ld2[np.where(ld1[:,:,2]<20)]=-1
+                #dst3=ConstantApprox(ld2,filt,0.99)
 
-                ld[:,:,0]=ld[:,:,0]+20*dst1
-                ld[:,:,1]=ld[:,:,1]+20*dst2
-                ld[:,:,2]=ld[:,:,2]+20*dst3
-                dst3=(1+dst3)/2
-                ld1=255*X-ld 
+                #ld[:,:,0]=ld[:,:,0]+20*dst1
+                #ld[:,:,1]=ld[:,:,1]+20*dst2
+                #ld[:,:,2]=ld[:,:,2]+20*dst3
+                #dst3=(1+dst3)/2
+                #ld1=255*X-ld   
 
-                imagename=imagefile[:-4]+str(level)+'.png' 
-                ldshow=(250-ld*10/(level+1)).astype('uint8')
-                cv2.imshow(str(level),ldshow)
-                cv2.waitKey(1)
-                cv2.imwrite( imagename,ldshow)
+                #cv2.imshow('temp',(255-10*ld/(level+1)).astype('uint8'))
+                #cv2.waitKey(1)
 
-            ld=(255-ld).astype('uint8')
+            ld=255-ld
             cv2.imshow("Input Image",beeld)
             cv2.imshow("white",lw.astype('uint8'))
-            cv2.imshow("black",lb.astype('uint8'))
-            cv2.imshow("prefilter",ld)
-            imagename=imagefile
-            cv2.imwrite( imagename,ld)
-            cv2.waitKey(1)
+            cv2.imshow("gray",lb.astype('uint8'))
+            cv2.imshow("black",law.astype('uint8'))
+
+            cv2.waitKey()
             #plt.show()
             
-
-
-
-
-

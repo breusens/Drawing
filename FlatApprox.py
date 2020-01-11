@@ -84,18 +84,24 @@ for folder in my_list:
             ld=np.zeros((cols,rows,3))
 
             for level in range(14):
-
+                filt=GravitationalFilter(np.sqrt(2),3,20)
                 ld2=np.ones((cols,rows))
-                ld2[np.where(ld1[:,:,0]<20)]=-1
-                dst1=StrokeApproximation(ld2)
+                ld2[np.where(ld1[:,:,0]<20)]=-1 
+                dst = -cv2.filter2D(ld2,-1,filt)
+                dst1=0*ld2
+                dst1[np.where(dst<0)]=1
 
                 ld2=np.ones((cols,rows))
                 ld2[np.where(ld1[:,:,1]<20)]=-1
-                dst2=StrokeApproximation(ld2)
+                dst = -cv2.filter2D(ld2,-1,filt)
+                dst2=0*ld2
+                dst2[np.where(dst<0)]=1
 
                 ld2=np.ones((cols,rows))
                 ld2[np.where(ld1[:,:,2]<20)]=-1
-                dst3=StrokeApproximation(ld2)
+                dst = -cv2.filter2D(ld2,-1,filt)
+                dst3=0*ld2
+                dst3[np.where(dst<0)]=1
 
                 ld[:,:,0]=ld[:,:,0]+20*dst1
                 ld[:,:,1]=ld[:,:,1]+20*dst2
@@ -104,7 +110,7 @@ for folder in my_list:
                 ld1=255*X-ld 
 
                 imagename=imagefile[:-4]+str(level)+'.png' 
-                ldshow=(250-ld*10/(level+1)).astype('uint8')
+                ldshow=(250-ld*10/level).astype('uint8')
                 cv2.imshow(str(level),ldshow)
                 cv2.waitKey(1)
                 cv2.imwrite( imagename,ldshow)
